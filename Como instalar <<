@@ -1,6 +1,6 @@
 Para instalar é bem simples 
 (uso o linux elementary)
-                                  sudo cp ~/guilhermecrypt/guilhermecrypt   /bin/
+                                  sudo cp ~/guilhermecrypt-master/guilhermecrypt   /bin/
   
   
   Após digitar esse comando no terminal digite: guilhermecrypt 
