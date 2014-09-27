@@ -1,0 +1,100 @@
+#!/bin/bash
+# Open source! faça oque quiser!
+# só tenha vergonha na cara e de os creditos :D
+
+declare -r VERSION_STRING="1.1.1-next"
+
+EX_USAGE=64 # 
+
+
+declare -i password_length=8
+declare -r -i MIN_LENGTH=1
+declare -r -i MAX_LENGTH=32
+
+print_help()
+{
+        echo "-------------------------------------------------------------"
+	echo "|Para usar simplesmente digite guilhermecrypt no terminal :D|"
+        echo "-------------------------------------------------------------"
+}
+
+print_version()
+{
+	echo "$0: version: $VERSION_STRING"
+
+}
+
+print_sobre()
+{
+         echo "-----------------------------------------"
+         echo "|Gerador de senhas criado por guilhermeC|"
+         echo "-----------------------------------------"
+} 
+
+parse_parameters()
+{
+	for cur_param in $@; do
+		if [[ $cur_param =~ -p|--paranoid ]]; then
+			TRUE_RANDOM=1
+			STARVING_POOL=1
+		elif [[ $cur_param =~ [[:digit:]]+ ]]; then
+			password_length=$cur_param
+			if ((password_length < MIN_LENGTH)); then
+				password_length=$MIN_LENGTH
+			fi
+			if ((password_length > MAX_LENGTH)); then
+				password_length=$MAX_LENGTH
+			fi
+		elif [[ $cur_param =~ --version ]]; then
+			print_version
+			exit 0
+		elif [[ $cur_param =~ --help ]]; then
+			print_help
+			exit 0
+                elif [[ $cur_param =~ --sobre ]]; then
+                            print_sobre  
+                           
+                        exit 0
+                 
+		else
+                        echo "---------------------"
+			echo "|Argumento invalido!|" 
+                        echo "---------------------"
+                        echo ""
+                       
+			print_help
+			exit $EX_USAGE
+		fi
+	done
+}
+parse_parameters $@
+
+
+declare -r -i MIN_CHARS=100
+declare -i pegadosx =$((password_length*10))
+if ((pegadosx < MIN_CHARS)); then
+	pegadosx=$MIN_CHARS
+fi
+
+if [ $TRUE_RANDOM ]; then
+	declare -r RANDOM_ENTROPY_POOL=/dev/random
+else
+	declare -r RANDOM_ENTROPY_POOL=/dev/urandom
+fi
+
+declare -r -i ROWS=10
+if [ $STARVING_POOL ]; then
+	declare -r -i COLUMNS=1
+else
+	declare -r -i COLUMNS=10
+fi
+
+for ((i=1; i <= ROWS; i++)); do
+	for ((j=1; j <= COLUMNS; j++)); do
+		senha=`head -c $pegadosx $RANDOM_ENTROPY_POOL | tr -dc [:graph:] | head -c $password_length`
+		echo -n "$senha "
+                echo "<<---  Senha Gerada com sucesso!"
+	done
+	echo
+done
+exit 0
